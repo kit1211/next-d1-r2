@@ -30,6 +30,18 @@ export async function create(params: ProductParamCreate) {
 
 }
 
+export async function deleteById(id: string) {
+    try{
+        const sql = `DELETE FROM product WHERE id = ?`;
+        const result = await DB.prepare(sql).bind(id).run();
+        if(result)
+            return result.success;
+    }catch(error: any){
+        return error.message
+    }
+}
+
+
 export async function findById(id: string) {
     try {
         const sql = `SELECT * FROM product WHERE id = ?`;
@@ -41,27 +53,35 @@ export async function findById(id: string) {
     }
 }
 
-export async function update(params:any, obj:object) {
+export async function update(params:any, obj:any) {
     try {
         const id:string = params;
-        const objm:object = obj;
-        console.log('id', id);
-        console.log('params', objm);
-        // use findById
+        const objm:any = obj;
         // console.log('id', id);
+        // console.log('params', objm);
         const data:any = await findById(id);
 
-        // const sql = `UPDATE product SET name = ?, description = ?, price = ?, quantity = ? WHERE id = ?`;
-        // const result = await DB.prepare(sql).bind(name, description, price, quantity, id).run();
-        // if(result)
-            return data;
+        //ตรวจสอบมีการเปลี่ยนแปลงค่าหรือไม่ ถ้าไม่ก็รีเทิร์น error ออกไป
+        if(!objm.name && !objm.description && !objm.price && !objm.quantity)
+            return 'No data change';
+    
+        // ตรวจสอบค่าที่รับเข้ามา หากไม่มีให้ใช้ค่าจาก findbyid
+        const name = objm.name || data[0].name;
+        const description = objm.description || data[0].description;
+        const price = objm.price || data[0].price;
+        const quantity = objm.quantity || data[0].quantity;
+        
+        const sql = `UPDATE product SET name = ?, description = ?, price = ?, quantity = ? WHERE id = ?`;
+        const result = await DB.prepare(sql).bind(name, description, price, quantity, id).run();
+        if(result)
+            return result.success;
+
     } catch (error: any) {
         return error.message
-        
     }
 }
 
 
 
 
-export default { findAll, create, update, findById }
+export default { findAll, create, update, findById, deleteById }
