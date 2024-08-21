@@ -1,5 +1,5 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
-import { create, findAllImage } from './service';
+import { create, findAllImage, deleteByImageName } from './service';
 
 const s3 = new S3Client({
     endpoint: 'https://69085aadf4ffd773057d9221f9040e9d.r2.cloudflarestorage.com',
@@ -56,6 +56,7 @@ export const DELETE = async (req: Request) => {
             Key: fileName,
         };
         await s3.send(new DeleteObjectCommand(params));
+        await deleteByImageName(fileName);
         return new Response(JSON.stringify({ message: 'File deleted successfully' }), { status: 200 });
     } catch (error) {
         console.error('Delete Error:', error);

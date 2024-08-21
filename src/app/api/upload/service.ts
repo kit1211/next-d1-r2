@@ -4,11 +4,12 @@ import { NextResponse } from 'next/server';
 
 
 export const runtime = 'edge'
-const DB = getRequestContext().env.DB;
 
 
 export async function create(name:string, bucket:string) {
     try {
+        const DB = getRequestContext().env.DB;
+
         const sql = `INSERT INTO image_info (name, bucket) VALUES  (?, ?)`;
         const result = await DB.prepare(sql).bind(name, bucket).run();
         return result;
@@ -21,6 +22,8 @@ export async function create(name:string, bucket:string) {
 
 export async function findAllImage() {
     try {
+        const DB = getRequestContext().env.DB;
+
         const sql = `SELECT * FROM image_info`;
         const result = await DB.prepare(sql).bind().run();
         return result.results;
@@ -32,6 +35,7 @@ export async function findAllImage() {
 
 export async function findByName(name: string) {
     try {
+        const DB = getRequestContext().env.DB;
         const sql = `SELECT * FROM image_info WHERE name = ?`;
         const result = await DB.prepare(sql).bind(name).run();
         return result.results;
@@ -43,7 +47,20 @@ export async function findByName(name: string) {
 
 
 
+export async function deleteByImageName(name: string) {
+    try{
+        const DB = getRequestContext().env.DB;
+        const sql = `DELETE FROM image_info WHERE name = ?`;
+        const result = await DB.prepare(sql).bind(name).run();
+        if(result)
+            return result.success;
+    }catch(error: any){
+        return error.message
+    }
+}
 
 
-export default {  create, findByName, findAllImage }
+
+
+export default {  create, findByName, findAllImage, deleteByImageName }
 

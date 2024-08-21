@@ -5,12 +5,12 @@ import { NextResponse } from 'next/server';
 
 
 export const runtime = 'edge'
-const DB = getRequestContext().env.DB;
 
 
 
 export async function create(username: string, password: string) {
     try {
+        const DB = getRequestContext().env.DB;
         const hash = hashSync(password, genSaltSync(10));
         const sql = `INSERT INTO users (username, password) VALUES  (?, ?)`;
         const result = await DB.prepare(sql).bind(username, hash).run();
@@ -24,6 +24,9 @@ export async function create(username: string, password: string) {
 
 export async function findAllUser() {
     try {
+
+        const DB = getRequestContext().env.DB;
+
         const sql = `SELECT * FROM users`;
         const result = await DB.prepare(sql).bind().run();
         return result.results;
@@ -35,6 +38,8 @@ export async function findAllUser() {
 
 export async function findByUsername(username: string) {
     try {
+        const DB = getRequestContext().env.DB;
+
         const sql = `SELECT * FROM users WHERE username = ?`;
         const result = await DB.prepare(sql).bind(username).run();
         return result.results;

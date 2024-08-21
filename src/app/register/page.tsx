@@ -36,7 +36,7 @@ export default function RegisterPage() {
         <div className="container-fluid m-2 d-flex justify-content-center">
             <div className="card w-50">
                 <div className="card-body">
-                    <h1>Register User!</h1>
+                    <h1 className="mb-5 text-center">Register User!</h1>
                     <div className="mb-3 row">
                         <label className="col-sm-4 col-form-label">Username</label>
                         <div className="col-sm-8">

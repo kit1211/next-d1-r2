@@ -2,9 +2,9 @@ import type { NextRequest, NextResponse } from 'next/server'
 import { getRequestContext } from '@cloudflare/next-on-pages'
 
 export const runtime = 'edge'
-const DB = getRequestContext().env.DB;
 
 export async function GET(request: NextRequest) {
+    const DB = getRequestContext().env.DB;
     const result = await DB.prepare('select * from product').run();
     const data = result.results;
     return new Response(JSON.stringify(data), {

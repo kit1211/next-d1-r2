@@ -1,12 +1,12 @@
 import { getRequestContext } from '@cloudflare/next-on-pages'
 
 export const runtime = 'edge'
-const DB = getRequestContext().env.DB;
 
 
 
 export async function findByUsername(username: string) {
     try {
+        const DB = getRequestContext().env.DB;
         const sql = `SELECT * FROM users WHERE username = ?`;
         const result = await DB.prepare(sql).bind(username).run();
         return result.results;
