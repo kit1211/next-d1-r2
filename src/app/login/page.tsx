@@ -13,12 +13,12 @@ export default function LoginPage() {
 
     const handleLogin = async () => {
         try {
+            setMessage('');
             const response = await fetch('/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),
             });
-
             const data: any = await response.json();
             if (response.ok) {
                 localStorage.setItem('token', data.token);
@@ -28,6 +28,7 @@ export default function LoginPage() {
                 setMessage(data.message);
             }
         } catch (error) {
+            console.log(error)
             setMessage('An error occurred');
         }
     };

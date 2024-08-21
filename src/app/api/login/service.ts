@@ -4,6 +4,8 @@ export const runtime = 'edge'
 
 
 
+
+
 export async function findByUsername(username: string) {
     try {
         const DB = getRequestContext().env.DB;
@@ -12,7 +14,6 @@ export async function findByUsername(username: string) {
         return result.results;
     } catch (error: any) {
         return error.message
-        
     }
 }
 
