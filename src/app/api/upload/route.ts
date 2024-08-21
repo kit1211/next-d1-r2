@@ -1,11 +1,19 @@
-import AWS from 'aws-sdk';
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { create, findAllImage } from './service';
 
-const s3 = new AWS.S3({
-    endpoint: 'https://69085aadf4ffd773057d9221f9040e9d.r2.cloudflarestorage.com', // ใช้ endpoint ของ R2 ของคุณ
-    accessKeyId: process.env.R2_ACCESS_KEY_ID,
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
-    region: 'auto', // ใช้ 'auto' สำหรับ R2
+const s3 = new S3Client({
+    endpoint: 'https://69085aadf4ffd773057d9221f9040e9d.r2.cloudflarestorage.com',
+    region: 'auto',
+    credentials: {
+        accessKeyId: process.env.R2_ACCESS_KEY_ID || '',
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || '',
+    },
 });
+
+
+export const runtime = 'edge';
+
+
 
 export const POST = async (req: Request) => {
     try {
@@ -15,21 +23,18 @@ export const POST = async (req: Request) => {
         if (!file) {
             return new Response(JSON.stringify({ message: 'No file uploaded' }), { status: 400 });
         }
-
-        // อ่านไฟล์เป็น Buffer
-        const buffer = await file.arrayBuffer();  // แปลง ReadableStream เป็น ArrayBuffer
-        const fileBuffer = Buffer.from(buffer);   // แปลง ArrayBuffer เป็น Buffer
-
+        const buffer = await file.arrayBuffer();
+        const fileNameRepl = `${Date.now()}_${file.name}`;
         const params = {
-            Bucket: process.env.R2_BUCKET_NAME!, // ตั้งค่าชื่อ Bucket ของคุณ
-            Key: `${Date.now()}_${file.name}`, // ตั้งชื่อไฟล์ใน R2
-            Body: fileBuffer,
+            Bucket: process.env.R2_BUCKET_NAME!,
+            Key: fileNameRepl,
+            Body: Buffer.from(buffer),
             ContentType: file.type,
         };
 
-        const uploadResult = await s3.upload(params).promise();
-        // console.log('Upload Result:', uploadResult);
-        return new Response(JSON.stringify({ message: 'File uploaded successfully', fileNamee: uploadResult.Key }), { status: 200 });
+        await s3.send(new PutObjectCommand(params));
+        await create(fileNameRepl, process.env.R2_BUCKET_NAME!);
+        return new Response(JSON.stringify({ message: 'File uploaded successfully', fileName: fileNameRepl }), { status: 200 });
     } catch (error) {
         console.error('Upload Error:', error);
         return new Response(JSON.stringify({ message: 'File upload failed', error }), { status: 500 });
@@ -45,12 +50,26 @@ export const DELETE = async (req: Request) => {
         if (!fileName) {
             return new Response(JSON.stringify({ message: 'No file name provided' }), { status: 400 });
         }
+
         const params = {
             Bucket: process.env.R2_BUCKET_NAME!,
             Key: fileName,
         };
-        await s3.deleteObject(params).promise();
+        await s3.send(new DeleteObjectCommand(params));
         return new Response(JSON.stringify({ message: 'File deleted successfully' }), { status: 200 });
+    } catch (error) {
+        console.error('Delete Error:', error);
+        return new Response(JSON.stringify({ message: 'File deletion failed', error }), { status: 500 });
+    }
+};
+
+
+
+
+export const GET = async () => {
+    try {
+        const result = await findAllImage();
+        return new Response(JSON.stringify({ message: 'GETDATA', resullt: result }), { status: 200 });
     } catch (error) {
         console.error('Delete Error:', error);
         return new Response(JSON.stringify({ message: 'File deletion failed', error }), { status: 500 });

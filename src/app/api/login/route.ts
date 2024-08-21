@@ -25,14 +25,8 @@ export async function POST(request: Request) {
         .setProtectedHeader({ alg: 'HS256' })
         .setExpirationTime('20m')
         .sign(secretKey);
-    const response = NextResponse.json({ message: 'Login successful' });
-    response.cookies.set('token', token, {
-        httpOnly: true,   // ป้องกันการเข้าถึงจาก JavaScript
-        secure: process.env.NODE_ENV === 'production',  // ใช้ secure flag ใน production
-        maxAge: 20 * 60,  // อายุของ cookie (20 นาที)
-        path: '/',        // ให้ cookie ใช้งานได้ทั่วทั้งแอปพลิเคชัน
-    });
-    return response;
+    
+    return NextResponse.json({ message: 'Login_successful', token });
 }
 
 

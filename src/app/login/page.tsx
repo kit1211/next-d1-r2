@@ -1,6 +1,6 @@
 // /src/app/login/page.tsx
 'use client';
-
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function LoginPage() {
@@ -8,6 +8,8 @@ export default function LoginPage() {
     const [username, setUsername]   = useState('');
     const [password, setPassword]   = useState('');
     const [message, setMessage]     = useState('');
+    const router = useRouter();
+
 
     const handleLogin = async () => {
         try {
@@ -21,8 +23,7 @@ export default function LoginPage() {
             if (response.ok) {
                 localStorage.setItem('token', data.token);
                 setMessage('Login successful');
-                // redirect to /uploader
-                window.location.href = '/uploader';
+                router.push('/uploader'); // Redirect หลังจากเข้าสู่ระบบสำเร็จ
             } else {
                 setMessage(data.message);
             }

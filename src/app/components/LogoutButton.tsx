@@ -1,23 +1,20 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+
 const LogoutButton = () => {
     const router = useRouter();
 
-    const handleLogout = async () => {
-        // เรียก API สำหรับ logout
-        await fetch('/api/logout', {
-            method: 'GET',
-        });
-
-        // Redirect ไปที่หน้า Login
-        router.push('/login');
+    const handleLogout = () => {
+        // ลบ JWT token ออกจาก localStorage
+        localStorage.removeItem('token');
+        router.push('/login'); // Redirect ไปที่หน้า Login หลังจาก logout
     };
 
     return (
-   
-        <Link className="nav-link" href="่javascript:;" onClick={handleLogout}>Logout</Link>
+        <button onClick={handleLogout} className="btn btn-danger">
+            Logout
+        </button>
     );
 };
 

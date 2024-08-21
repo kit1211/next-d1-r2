@@ -3,23 +3,19 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import LogoutButton from './LogoutButton';
-import { getCookie } from "cookies-next";
-
 
 const Nav = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    const jwtToken = getCookie("token");
-    console.log("Cookies:", jwtToken);
-    // useEffect(() => {
-        // const token = cookies;
-
-        // if (token) {
-        //     setIsLoggedIn(true);  // ผู้ใช้เข้าสู่ระบบแล้ว
-        // } else {
-        //     setIsLoggedIn(false);  // ผู้ใช้ยังไม่ได้เข้าสู่ระบบ
-        // }
-    // }, []);
+    useEffect(() => {
+        // ตรวจสอบ JWT token จาก localStorage
+        const token = localStorage.getItem('token');
+        if (token) {
+            setIsLoggedIn(true);  // ผู้ใช้เข้าสู่ระบบแล้ว
+        } else {
+            setIsLoggedIn(false);  // ผู้ใช้ยังไม่ได้เข้าสู่ระบบ
+        }
+    }, []);
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -41,6 +37,9 @@ const Nav = () => {
                         <li className="nav-item">
                             <Link className="nav-link active" aria-current="page" href="/uploader">Uploader</Link>
                         </li>
+                        <li className="nav-item">
+                            <Link className="nav-link active" aria-current="page" href="/Manager">Manager</Link>
+                        </li>
                     </ul>
                     <ul className="navbar-nav ml-auto mb-2 mb-lg-0">
                         {!isLoggedIn && (
@@ -55,7 +54,7 @@ const Nav = () => {
                         )}
                         {isLoggedIn && (
                             <li className="nav-item">
-                                <LogoutButton /> {/* ปุ่ม Logout จะถูกแสดงเมื่อผู้ใช้เข้าสู่ระบบ */}
+                                <LogoutButton /> {/* ปุ่ม Logout จะแสดงเมื่อผู้ใช้เข้าสู่ระบบ */}
                             </li>
                         )}
                     </ul>
